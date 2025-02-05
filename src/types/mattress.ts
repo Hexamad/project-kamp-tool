@@ -25,7 +25,7 @@ export const MATERIALS: Material[] = [
   {
     id: 'ROTTO',
     name: 'ROTTO FABRIC WITH QUILTING',
-    costPerUnit: 20.75,
+    costPerUnit: 20.95,
     description: 'Responsive and durable natural latex'
   },
 
