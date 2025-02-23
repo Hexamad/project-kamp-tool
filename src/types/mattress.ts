@@ -12,10 +12,12 @@ export interface Layer {
 }
 
 export interface MattressConfig {
-  length: number; // in inches
-  width: number; // in inches
-  totalHeight: number; // in mm
-  layers: Layer[];
+  length: number;
+  width: number;
+  totalHeight: number;
+  topLayers: Layer[];
+  coreLayers: Layer[];
+  bottomLayers: Layer[];
   timestamp: number;
 }
 
@@ -37,85 +39,54 @@ export const MATERIALS: Material[] = [
     description: 'Responsive and durable natural latex'
   },
 
-
-
-
   {
-    id: 'cotkook',
+    id: 'cotlook',
     name: 'COTLOOK FABRIC WITH QUILTING',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
-
-
   {
     id: 'stretchable',
     name: 'STRETCHABLE FABRIC WITH QUILTING',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
   {
     id: 'COTTONFABRIC',
     name: 'COTTON FABRIC WITH QUILTING',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
-
-
   {
     id: 'KNITTEDFABRIC',
     name: 'KNITTED FABRIC WITH QUILTING',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
   {
     id: 'REXIN',
     name: 'REXIN',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
   {
     id: 'FABRIC',
     name: 'FABRIC',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
   {
     id: 'LowDensity ',
     name: 'LOW DENSITY PU FOAM',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
   {
     id: 'HDPU',
     name: 'HD PU Foam',
     costPerUnit: 20.75,
     description: 'Responsive and durable natural latex'
   },
-
-
-
   {
     id: 'SUPERSOFT',
     name: 'SUPER SOFT FOAM',

@@ -1,206 +1,466 @@
 import React, { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { Download, Plus } from 'lucide-react';
-import { Layer, MattressConfig, MATERIALS } from './types/mattress';
+import { Layer, MattressConfig } from './types/mattress';
 import { calculateRemainingHeight, calculateTotalCost } from './utils/calculations';
 import { generateMattressPDF } from './utils/pdfUtils';
-import { LayerConfig } from './components/LayerConfig';
+import LayerConfig from './components/LayerConfig';
 import { MattressPreview } from './components/MattressPreview';
 
-function App() {
-  const [config, setConfig] = useState<MattressConfig>(() => {
-    const saved = localStorage.getItem('currentConfig');
-    return saved ? JSON.parse(saved) : {
-      length: 80,
-      width: 60,
-      totalHeight: 300,
-      layers: [
-        {
-          id: nanoid(),
-          materialId: 'memory-foam',
-          thickness: 50
-        }
-      ],
-      timestamp: Date.now()
-    };
-  });
 
-  useEffect(() => {
-    localStorage.setItem('currentConfig', JSON.stringify(config));
-  }, [config]);
+const TOP_LAYER_MATERIALS = [
+  {
+    id: 'ROTTO',
+    name: 'ROTTO FABRIC WITH QUILTING',
+    costPerUnit: 20.95,
+    description: 'Responsive and durable natural latex'
+  },
 
-  const remainingHeight = calculateRemainingHeight(config.totalHeight, config.layers);
-  const totalCost = calculateTotalCost(config.layers, config.length, config.width);
 
-  const addLayer = () => {
-    if (config.layers.length >= 7) return;
-    
-    setConfig(prev => ({
-      ...prev,
-      layers: [
-        ...prev.layers,
-        {
-          id: nanoid(),
-          materialId: 'memory-foam',
-          thickness: Math.min(50, remainingHeight)
-        }
-      ]
-    }));
-  };
+  {
+    id: 'satin',
+    name: 'SATIN FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
 
-  const updateLayer = (index: number, updatedLayer: Layer) => {
-    const newLayers = [...config.layers];
-    newLayers[index] = updatedLayer;
-    setConfig(prev => ({ ...prev, layers: newLayers }));
-  };
+  {
+    id: 'cotlook',
+    name: 'COTLOOK FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'stretchable',
+    name: 'STRETCHABLE FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'COTTONFABRIC',
+    name: 'COTTON FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'KNITTEDFABRIC',
+    name: 'KNITTED FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'REXIN',
+    name: 'REXIN',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'FABRIC',
+    name: 'FABRIC',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+];
 
-  const removeLayer = (index: number) => {
-    setConfig(prev => ({
-      ...prev,
-      layers: prev.layers.filter((_, i) => i !== index)
-    }));
-  };
+const CORE_LAYER_MATERIALS = [
+  {
+    id: 'LowDensity ',
+    name: 'LOW DENSITY PU FOAM',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'HDPU',
+    name: 'HD PU Foam',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'SUPERSOFT',
+    name: 'SUPER SOFT FOAM',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
 
-  const saveConfiguration = () => {
-    const savedConfigs = JSON.parse(localStorage.getItem('mattressConfigs') || '[]');
-    const newConfig = { ...config, timestamp: Date.now() };
-    localStorage.setItem(
-      'mattressConfigs',
-      JSON.stringify([...savedConfigs, newConfig])
-    );
-    alert('Configuration saved successfully!');
+  {
+    id: 'MEMORYFOAM',
+    name: 'MEMORY FOAM SHEETS',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'GELMEMORY',
+    name: 'GEL MEMORY FOAM SHEETS',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'latexSHEET',
+    name: 'LATEX SHEET',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'latex7',
+    name: 'LATEX 7 ZONE SHEETS',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'COIRSHEET',
+    name: 'COIR SHEET',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'REBONDEDSHEETS',
+    name: 'REBONDED SHEETS',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'HRFoam',
+    name: 'HR Foam',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+
+  {
+    id: 'FIRERTARDANT',
+    name: 'FIRE RETARDANT',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'EPE',
+    name: 'EPE',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'FELT',
+    name: 'FELT',
+    costPerUnit: 20.55,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'BONNEL',
+    name: 'BONNEL',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'POCKET',
+    name: 'POCKET',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+];
+
+const BOTTOM_LAYER_MATERIALS = [
+  {
+    id: 'ROTTO',
+    name: 'ROTTO FABRIC WITH QUILTING',
+    costPerUnit: 20.95,
+    description: 'Responsive and durable natural latex'
+  },
+
+
+  {
+    id: 'satin',
+    name: 'SATIN FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+
+  {
+    id: 'cotlook',
+    name: 'COTLOOK FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'stretchable',
+    name: 'STRETCHABLE FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'COTTONFABRIC',
+    name: 'COTTON FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'KNITTEDFABRIC',
+    name: 'KNITTED FABRIC WITH QUILTING',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'REXIN',
+    name: 'REXIN',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+  {
+    id: 'FABRIC',
+    name: 'FABRIC',
+    costPerUnit: 20.75,
+    description: 'Responsive and durable natural latex'
+  },
+];
+
+type Unit = 'mm' | 'inch' | 'feet';
+type HeightUnit = 'mm' | 'inch';
+
+const convertToMM = (value: number, fromUnit: Unit | HeightUnit): number => {
+  switch (fromUnit) {
+    case 'inch': return value * 25.4;
+    case 'feet': return value * 304.8;
+    default: return value;
+  }
+};
+
+const convertFromMM = (mmValue: number, toUnit: Unit | HeightUnit): number => {
+  switch (toUnit) {
+    case 'inch': return mmValue / 25.4;
+    case 'feet': return mmValue / 304.8;
+    default: return mmValue;
+  }
+};
+
+interface DimensionInputProps {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  unit: Unit | HeightUnit;
+  onUnitChange: (unit: Unit | HeightUnit) => void;
+  allowedUnits: Unit[] | HeightUnit[];
+}
+
+const DimensionInput: React.FC<DimensionInputProps> = ({
+  label,
+  value,
+  onChange,
+  unit,
+  onUnitChange,
+  allowedUnits
+}) => {
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numValue = parseFloat(e.target.value);
+    if (!isNaN(numValue)) onChange(numValue);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-bold mb-6">Mattress Dimensions</h2>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Length (inches)
-                  </label>
-                  <input
-                    type="number"
-                    value={config.length}
-                    onChange={(e) =>
-                      setConfig(prev => ({
-                        ...prev,
-                        length: Number(e.target.value)
-                      }))
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Width (inches)
-                  </label>
-                  <input
-                    type="number"
-                    value={config.width}
-                    onChange={(e) =>
-                      setConfig(prev => ({
-                        ...prev,
-                        width: Number(e.target.value)
-                      }))
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Total Height (mm)
-                  </label>
-                  <input
-                    type="number"
-                    value={config.totalHeight}
-                    onChange={(e) =>
-                      setConfig(prev => ({
-                        ...prev,
-                        totalHeight: Number(e.target.value)
-                      }))
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-            </div>
+    <div className="space-y-1">
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="flex gap-2">
+        <input
+          type="number"
+          value={value.toFixed(2)}
+          onChange={handleValueChange}
+          className="w-full rounded-md border p-2"
+        />
+        <select
+          value={unit}
+          onChange={(e) => onUnitChange(e.target.value as Unit | HeightUnit)}
+          className="rounded-md border p-2"
+        >
+          {allowedUnits.map(unit => (
+            <option key={unit} value={unit}>{unit}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+};
 
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Layers Configuration</h2>
+const DEFAULT_CONFIG: MattressConfig = {
+  length: 1000,  // mm
+  width: 900,    // mm
+  totalHeight: 300,  // mm
+  topLayers: [],
+  coreLayers: [],
+  bottomLayers: [],
+  timestamp: Date.now()
+};
+
+function App() {
+  const [lengthUnit, setLengthUnit] = useState<Unit>('mm');
+  const [widthUnit, setWidthUnit] = useState<Unit>('mm');
+  const [heightUnit, setHeightUnit] = useState<HeightUnit>('mm');
+  const [config, setConfig] = useState<MattressConfig>(DEFAULT_CONFIG);
+
+  // Persist config to localStorage
+  useEffect(() => {
+    const savedConfig = localStorage.getItem('mattressConfig');
+    if (savedConfig) setConfig(JSON.parse(savedConfig));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('mattressConfig', JSON.stringify(config));
+  }, [config]);
+
+  const handleDimensionChange = (field: keyof MattressConfig) => 
+    (value: number, unit: Unit | HeightUnit) => {
+      const mmValue = convertToMM(value, unit);
+      setConfig(prev => ({ ...prev, [field]: mmValue }));
+    };
+
+  const addLayer = (section: 'topLayers' | 'coreLayers' | 'bottomLayers') => {
+    const materials = {
+      topLayers: TOP_LAYER_MATERIALS,
+      coreLayers: CORE_LAYER_MATERIALS,
+      bottomLayers: BOTTOM_LAYER_MATERIALS
+    }[section][0].id;
+
+    setConfig(prev => ({
+      ...prev,
+      [section]: [...prev[section], {
+        id: nanoid(),
+        materialId: materials,
+        thickness: section === 'coreLayers' ? 
+          convertToMM(50, heightUnit) : // Default 50mm for core
+          convertToMM(30, heightUnit)   // Default 30mm for top/bottom
+      }]
+    }));
+  };
+
+  const updateLayer = (section: 'topLayers' | 'coreLayers' | 'bottomLayers', index: number, updates: Partial<Layer>) => {
+    setConfig(prev => {
+      const layers = [...prev[section]];
+      layers[index] = { ...layers[index], ...updates };
+      return { ...prev, [section]: layers };
+    });
+  };
+
+  const deleteLayer = (section: 'topLayers' | 'coreLayers' | 'bottomLayers', index: number) => {
+    setConfig(prev => ({
+      ...prev,
+      [section]: prev[section].filter((_, i) => i !== index)
+    }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          {/* Dimension Controls */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-2xl font-bold mb-4">Dimensions</h2>
+            <div className="space-y-4">
+              <DimensionInput
+                label="Length"
+                value={convertFromMM(config.length, lengthUnit)}
+                onChange={(v) => handleDimensionChange('length')(v, lengthUnit)}
+                unit={lengthUnit}
+                onUnitChange={setLengthUnit}
+                allowedUnits={['mm', 'inch']}
+              />
+              <DimensionInput
+                label="Width"
+                value={convertFromMM(config.width, widthUnit)}
+                onChange={(v) => handleDimensionChange('width')(v, widthUnit)}
+                unit={widthUnit}
+                onUnitChange={setWidthUnit}
+                allowedUnits={['mm', 'inch', 'feet']}
+              />
+              <DimensionInput
+                label="Total Height"
+                value={convertFromMM(config.totalHeight, heightUnit)}
+                onChange={(v) => handleDimensionChange('totalHeight')(v, heightUnit)}
+                unit={heightUnit}
+                onUnitChange={(unit) => setHeightUnit(unit as HeightUnit)}
+                allowedUnits={['mm', 'inch']}
+              />
+            </div>
+          </div>
+
+          {/* Layer Configuration Sections */}
+          {['top', 'core', 'bottom'].map((section) => (
+            <div key={section} className="bg-white p-6 rounded-lg shadow">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">{section.charAt(0).toUpperCase() + section.slice(1)} Layers</h3>
                 <button
-                  onClick={addLayer}
-                  disabled={config.layers.length >= 7}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  onClick={() => addLayer(`${section}Layers` as any)}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Layer
+                  <Plus className="inline mr-2" /> Add Layer
                 </button>
               </div>
-              
-              <div className="space-y-4">
-                {config.layers.map((layer, index) => (
-                  <LayerConfig
-                    key={layer.id}
-                    layer={layer}
-                    onUpdate={(updatedLayer) => updateLayer(index, updatedLayer)}
-                    onDelete={() => removeLayer(index)}
-                    isLast={config.layers.length === 1}
-                  />
-                ))}
-              </div>
-
-              <div className="mt-6 p-4 bg-gray-50 rounded-md">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-500">
-                    Remaining Height:
-                  </span>
-                  <span className="text-lg font-semibold">
-                    {remainingHeight}mm
-                  </span>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm font-medium text-gray-500">
-                    Total Cost (incl. labor):
-                  </span>
-                  <span className="text-lg font-semibold">
-                    ₹{totalCost.toLocaleString('en-IN', {
-                      maximumFractionDigits: 2,
-                      minimumFractionDigits: 2
-                    })}
-                  </span>
-                </div>
-              </div>
+              {(config as any)[`${section}Layers`].map((layer: Layer, index: number) => (
+                <LayerConfig
+                  key={layer.id}
+                  layer={layer}
+                  materials={
+                    section === 'top' ? TOP_LAYER_MATERIALS :
+                    section === 'core' ? CORE_LAYER_MATERIALS :
+                    BOTTOM_LAYER_MATERIALS
+                  }
+                  unit={heightUnit}
+                  showThickness={section === 'core'}
+                  onUpdate={(updates) => updateLayer(`${section}Layers` as any, index, updates)}
+                  onDelete={() => deleteLayer(`${section}Layers` as any, index)}
+                />
+              ))}
             </div>
+          ))}
 
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={saveConfiguration}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                Save Configuration
-              </button>
-              <button
-                onClick={() => generateMattressPDF(config, totalCost)}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Generate PDF
-              </button>
+          {/* Summary Section */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex justify-between mb-4">
+              <span>Remaining Height:</span>
+              <span className="font-bold">
+                {convertFromMM(
+                  calculateRemainingHeight(config.totalHeight, config.coreLayers),
+                  heightUnit
+                ).toFixed(2)}{heightUnit}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Total Cost:</span>
+              <span className="font-bold">
+                ₹{calculateTotalCost([...config.topLayers, ...config.coreLayers, ...config.bottomLayers], config.length, config.width).toLocaleString('en-IN')}
+              </span>
             </div>
           </div>
 
-          <div className="lg:sticky lg:top-6">
-            <MattressPreview
-              layers={config.layers}
-              totalHeight={config.totalHeight}
-            />
+          {/* Action Buttons */}
+          <div className="flex gap-4 justify-end">
+          // Update the PDF generation button in App.tsx
+<button
+  onClick={() => generateMattressPDF(config, {
+    lengthUnit,   // From state
+    widthUnit,    // From state
+    heightUnit:heightUnit  // From state
+  })}
+  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+>
+  <Download className="w-4 h-4 mr-2" />
+  Generate PDF
+</button>
           </div>
+        </div>
+
+        {/* Preview Panel */}
+        <div className="lg:sticky lg:top-8">
+          <MattressPreview 
+            layers={[...config.topLayers, ...config.coreLayers, ...config.bottomLayers]}
+            totalHeight={config.totalHeight}
+          />
         </div>
       </div>
     </div>
@@ -208,3 +468,6 @@ function App() {
 }
 
 export default App;
+export { TOP_LAYER_MATERIALS, CORE_LAYER_MATERIALS, BOTTOM_LAYER_MATERIALS };
+export type { Layer };
+export type { HeightUnit}
