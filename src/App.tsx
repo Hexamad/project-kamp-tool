@@ -224,10 +224,11 @@ const BOTTOM_LAYER_MATERIALS = [
 ];
 
 type Unit = 'mm' | 'inch' | 'feet';
-type HeightUnit = 'mm' | 'inch';
+type HeightUnit = 'mm' |'cm' | 'inch';
 
 const convertToMM = (value: number, fromUnit: Unit | HeightUnit): number => {
   switch (fromUnit) {
+    case 'cm': return value * 10;
     case 'inch': return value * 25.4;
     case 'feet': return value * 304.8;
     default: return value;
@@ -248,7 +249,7 @@ interface DimensionInputProps {
   onChange: (value: number) => void;
   unit: Unit | HeightUnit;
   onUnitChange: (unit: Unit | HeightUnit) => void;
-  allowedUnits: Unit[] | HeightUnit[];
+  allowedUnits: (Unit | HeightUnit)[];
 }
 
 const DimensionInput: React.FC<DimensionInputProps> = ({
@@ -355,28 +356,31 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
+      <div className="space-y-4 sm:space-y-6">
+        
           {/* Dimension Controls */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-2xl font-bold mb-4">Dimensions</h2>
-            <div className="space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Dimensions</h2> 
+          <div className="space-y-3 sm:space-y-4"> 
+            
               <DimensionInput
                 label="Length"
                 value={convertFromMM(config.length, lengthUnit)}
                 onChange={(v) => handleDimensionChange('length')(v, lengthUnit)}
                 unit={lengthUnit}
-                onUnitChange={setLengthUnit}
-                allowedUnits={['mm', 'inch']}
+                onUnitChange={(unit) => setLengthUnit(unit as Unit)}
+                allowedUnits={['mm', 'cm', 'inch', 'feet']}
+                 
               />
               <DimensionInput
                 label="Width"
                 value={convertFromMM(config.width, widthUnit)}
                 onChange={(v) => handleDimensionChange('width')(v, widthUnit)}
                 unit={widthUnit}
-                onUnitChange={setWidthUnit}
-                allowedUnits={['mm', 'inch', 'feet']}
+                onUnitChange={(unit) => setWidthUnit(unit as Unit)}
+                allowedUnits={['mm', 'cm', 'inch', 'feet']}
               />
               <DimensionInput
                 label="Total Height"
@@ -384,21 +388,23 @@ function App() {
                 onChange={(v) => handleDimensionChange('totalHeight')(v, heightUnit)}
                 unit={heightUnit}
                 onUnitChange={(unit) => setHeightUnit(unit as HeightUnit)}
-                allowedUnits={['mm', 'inch']}
+                allowedUnits={['mm', 'cm', 'inch']}
               />
             </div>
           </div>
 
           {/* Layer Configuration Sections */}
           {['top', 'core', 'bottom'].map((section) => (
-            <div key={section} className="bg-white p-6 rounded-lg shadow">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold">{section.charAt(0).toUpperCase() + section.slice(1)} Layers</h3>
-                <button
-                  onClick={() => addLayer(`${section}Layers` as any)}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-                >
-                  <Plus className="inline mr-2" /> Add Layer
+          <div key={section} className="bg-white p-4 sm:p-6 rounded-lg shadow">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3 sm:mb-4">
+              <h3 className="text-lg sm:text-xl font-bold">
+                {section.charAt(0).toUpperCase() + section.slice(1)} Layers
+              </h3>
+              <button
+                onClick={() => addLayer(`${section}Layers` as any)}
+                className="bg-indigo-600 text-white rounded-md hover:bg-indigo-700 w-full sm:w-auto text-sm sm:text-base px-3 py-1.5 sm:px-4 sm:py-2"
+              >
+                 <Plus className="inline mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> Add Layer
                 </button>
               </div>
               {(config as any)[`${section}Layers`].map((layer: Layer, index: number) => (
@@ -420,27 +426,29 @@ function App() {
           ))}
 
           {/* Summary Section */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between mb-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex flex-col sm:flex-row justify-between gap-2 text-sm sm:text-base">
+            <div className="flex justify-between sm:block">
               <span>Remaining Height:</span>
-              <span className="font-bold">
+              <span className="font-bold sm:ml-2">
                 {convertFromMM(
                   calculateRemainingHeight(config.totalHeight, config.coreLayers),
                   heightUnit
                 ).toFixed(2)}{heightUnit}
               </span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between sm:block">
               <span>Total Cost:</span>
-              <span className="font-bold">
+              <span className="font-bold sm:ml-2">
                 ₹{calculateTotalCost([...config.topLayers, ...config.coreLayers, ...config.bottomLayers], config.length, config.width).toLocaleString('en-IN')}
               </span>
             </div>
           </div>
+        </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 justify-end">
-          // Update the PDF generation button in App.tsx
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-end">
+          
 <button
   onClick={() => generateMattressPDF(config, {
     lengthUnit,   // From state
@@ -449,14 +457,14 @@ function App() {
   })}
   className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
 >
-  <Download className="w-4 h-4 mr-2" />
+<Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
   Generate PDF
 </button>
           </div>
         </div>
 
         {/* Preview Panel */}
-        <div className="lg:sticky lg:top-8">
+        <div className="lg:sticky lg:top-8 mt-4 sm:mt-0">
           <MattressPreview 
             layers={[...config.topLayers, ...config.coreLayers, ...config.bottomLayers]}
             totalHeight={config.totalHeight}

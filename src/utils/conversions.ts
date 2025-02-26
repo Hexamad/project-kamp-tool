@@ -1,5 +1,7 @@
-type LengthUnit = 'mm' | 'inch' | 'feet';
-type HeightUnit = 'mm' | 'inch';
+import { calculateRemainingHeight } from "./calculations";
+
+type LengthUnit = 'mm' | 'cm' | 'inch' | 'feet';
+export type HeightUnit = 'mm' | 'cm' | 'inch';
 
 export const convertToMM = (value: number, fromUnit: LengthUnit | HeightUnit): number => {
   switch (fromUnit) {
@@ -12,13 +14,17 @@ export const convertToMM = (value: number, fromUnit: LengthUnit | HeightUnit): n
   }
 };
 
-export const convertFromMM = (mmValue: number, toUnit: LengthUnit | HeightUnit): number => {
-  switch (toUnit) {
+export const convertFromMM = (value: number, unit: 'mm' | 'cm' | 'inch' | 'feet'): number => {
+  switch (unit) {
     case 'inch':
-      return mmValue / 25.4;
+      return value / 25.4;
     case 'feet':
-      return mmValue / 304.8;
-    default: // mm
-      return mmValue;
+      return value / 304.8;
+    case 'cm':
+      return value / 10;
+    default:
+      return value;
   }
 };
+
+

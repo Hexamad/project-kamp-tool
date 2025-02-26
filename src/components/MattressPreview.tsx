@@ -22,7 +22,9 @@ export const MattressPreview: React.FC<MattressPreviewProps> = ({
   const PREVIEW_HEIGHT = 400; // Fixed height in pixels
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg p-6 sticky top-6">
+    // <div className="w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg p-6 sticky top-6">
+      // In MattressPreview.tsx
+      <div className="w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg p-4 sm:p-6">
       <h3 className="text-xl font-semibold mb-6">Mattress Preview</h3>
       
       {/* Container with fixed height and border */}

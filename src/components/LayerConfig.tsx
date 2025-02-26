@@ -1,5 +1,6 @@
 import React from 'react';
-import { TOP_LAYER_MATERIALS, Layer, HeightUnit } from '../App';
+import { TOP_LAYER_MATERIALS, Layer } from '../App';
+import { HeightUnit } from '../utils/conversions';
 // In any file needing conversions
 import { convertToMM, convertFromMM } from '../utils/conversions';
 
@@ -26,7 +27,7 @@ const LayerConfig: React.FC<LayerConfigProps> = ({
   };
 
   return (
-    <div className="flex gap-4 items-center p-4 bg-gray-50 rounded-md mb-2">
+    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 p-2 bg-gray-50 rounded-md mb-2">
       <select
         value={layer.materialId}
         onChange={(e) => onUpdate({ materialId: e.target.value })}
